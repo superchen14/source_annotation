@@ -23,7 +23,7 @@ export default function applyMiddleware(...middlewares) {
       dispatch: (...args) => composedDispatch(...args)
     }
 
-    // 按照文档，中间件的函数结构为store => next => action {...; next(action)}
+    // 按照文档，中间件的函数结构为 store => next => action {...; next(action)}
     // 改一下参数名, 并给出一个默认的实现其实更好理解
     // 再次强调！异步请求以后调用的是chainedDispatch
     // let middleware = store => patchedDispatchOnRight => action => {

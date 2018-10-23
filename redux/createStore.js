@@ -1,6 +1,5 @@
 import $$observable from 'symbol-observable'
 import ActionTypes from './utils/actionTypes'
-import isPlainObject from './utils/isPlainObject'
 
 // enhancer参数必须由applyMiddleware调用生成
 export default function createStore(reducer, preloadedState, enhancer) {
@@ -66,13 +65,6 @@ export default function createStore(reducer, preloadedState, enhancer) {
 
   // dispatch是redux机制中修改state的唯一接口
   function dispatch(action) {
-    // 错误处理的逻辑
-    if (!isPlainObject(action)) { throw new Error( 'action必须是plain object') }
-    if (typeof action.type === 'undefined') { throw new Error( 'Action.type必须被定义') }
-
-    // 如果isDispatching为true，说明currentReducer正在处理一个action，因此不能处理新的action
-    if (isDispatching) { throw new Error('Reducers may not dispatch actions.') }
-
     try {
       // 处理当前action前，需要将isDispatching设置为true用来拒绝新的action
       isDispatching = true
@@ -95,10 +87,6 @@ export default function createStore(reducer, preloadedState, enhancer) {
 
   // 更改reducer的接口
   function replaceReducer(nextReducer) {
-    if (typeof nextReducer !== 'function') {
-      throw new Error('Expected the nextReducer to be a function.')
-    }
-
     currentReducer = nextReducer
     dispatch({ type: ActionTypes.REPLACE })
   }
