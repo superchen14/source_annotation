@@ -1,30 +1,25 @@
-function defaultEqualityCheck(a, b) {
-  return a === b
-}
+// 默认的相等判断函数
+function defaultEqualityCheck(a, b) { return a === b }
 
+// 用equalityCheck来遍历判断prev和next是否相等
 function areArgumentsShallowlyEqual(equalityCheck, prev, next) {
-  if (prev === null || next === null || prev.length !== next.length) {
-    return false
-  }
+  if (prev === null || next === null || prev.length !== next.length) { return false }
 
-  // Do this in a for loop (and not a `forEach` or an `every`) so we can determine equality as fast as possible.
   const length = prev.length
   for (let i = 0; i < length; i++) {
-    if (!equalityCheck(prev[i], next[i])) {
-      return false
-    }
+    if (!equalityCheck(prev[i], next[i])) { return false }
   }
-
   return true
 }
 
+// defaultMemoize返回一个函数，该函数每次被调用都会将当前的arguments保存为lastArgs并将func计算得到的结果保存为lastResult
+// 下一次调用时基于equalityCheck将lastArgs与arguments进行比较
+// 如果equalityCheck认为lastArgs与arguments相同，则直接返回lastResult
 export function defaultMemoize(func, equalityCheck = defaultEqualityCheck) {
   let lastArgs = null
   let lastResult = null
-  // we reference arguments instead of spreading them for performance reasons
   return function () {
     if (!areArgumentsShallowlyEqual(equalityCheck, lastArgs, arguments)) {
-      // apply arguments instead of spreading for performance.
       lastResult = func.apply(null, arguments)
     }
 
@@ -33,20 +28,15 @@ export function defaultMemoize(func, equalityCheck = defaultEqualityCheck) {
   }
 }
 
+// selector有两种写法
+// const shopItemsSelector = state => state.shop.items
+// const taxPercentSelector = state => state.shop.taxPercent
+// const getTaxTotal = (items, taxPercent) => items.reduce((acc, item) => acc + item.value * taxPercent / 100, 0)
+// 1. const taxPercentSelector = createSelector(shopItemsSelector, taxPercentSelector, getTaxTotal)
+// 2. const taxPercentSelector = createSelector([shopItemsSelector, taxPercentSelector], getTaxTotal)
+// getDependencies就是用来处理两种写法获得dependencies数组
 function getDependencies(funcs) {
-  const dependencies = Array.isArray(funcs[0]) ? funcs[0] : funcs
-
-  if (!dependencies.every(dep => typeof dep === 'function')) {
-    const dependencyTypes = dependencies.map(
-      dep => typeof dep
-    ).join(', ')
-    throw new Error(
-      'Selector creators expect all input-selectors to be functions, ' +
-      `instead received the following types: [${dependencyTypes}]`
-    )
-  }
-
-  return dependencies
+  return Array.isArray(funcs[0]) ? funcs[0] : funcs
 }
 
 export function createSelectorCreator(memoize, ...memoizeOptions) {
@@ -55,26 +45,24 @@ export function createSelectorCreator(memoize, ...memoizeOptions) {
     const resultFunc = funcs.pop()
     const dependencies = getDependencies(funcs)
 
+    // 用memoize封装保证dependencies的计算结果不变就可以直接返回上一次的结果
     const memoizedResultFunc = memoize(
       function () {
         recomputations++
-        // apply arguments instead of spreading for performance.
         return resultFunc.apply(null, arguments)
       },
       ...memoizeOptions
     )
 
-    // If a selector is called with the exact same arguments we don't need to traverse our dependencies again.
+    // 用memoize封装保证dependencies的参数不变就不需要计算每个dependency直接返回上一次的结果
     const selector = memoize(function () {
       const params = []
       const length = dependencies.length
 
       for (let i = 0; i < length; i++) {
-        // apply arguments instead of spreading and mutate a local list of params for performance.
         params.push(dependencies[i].apply(null, arguments))
       }
 
-      // apply arguments instead of spreading for performance.
       return memoizedResultFunc.apply(null, params)
     })
 
@@ -86,15 +74,10 @@ export function createSelectorCreator(memoize, ...memoizeOptions) {
   }
 }
 
+// 导出一个内置defaultMemoize的createSelector
 export const createSelector = createSelectorCreator(defaultMemoize)
 
 export function createStructuredSelector(selectors, selectorCreator = createSelector) {
-  if (typeof selectors !== 'object') {
-    throw new Error(
-      'createStructuredSelector expects first argument to be an object ' +
-      `where each property is a selector, instead received a ${typeof selectors}`
-    )
-  }
   const objectKeys = Object.keys(selectors)
   return selectorCreator(
     objectKeys.map(key => selectors[key]),
