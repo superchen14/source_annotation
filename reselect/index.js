@@ -34,7 +34,7 @@ export function defaultMemoize(func, equalityCheck = defaultEqualityCheck) {
 // const getTaxTotal = (items, taxPercent) => items.reduce((acc, item) => acc + item.value * taxPercent / 100, 0)
 // 1. const taxPercentSelector = createSelector(shopItemsSelector, taxPercentSelector, getTaxTotal)
 // 2. const taxPercentSelector = createSelector([shopItemsSelector, taxPercentSelector], getTaxTotal)
-// getDependencies就是用来处理两种写法获得dependencies数组
+// getDependencies就是用来保证两种情况下都能获得dependencies数组
 function getDependencies(funcs) {
   return Array.isArray(funcs[0]) ? funcs[0] : funcs
 }
