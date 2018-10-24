@@ -1,5 +1,3 @@
-import verifySubselectors from './verifySubselectors'
-
 export function impureFinalPropsSelectorFactory(
   mapStateToProps,
   mapDispatchToProps,
@@ -106,10 +104,6 @@ export default function finalPropsSelectorFactory(dispatch, {
   const mapStateToProps = initMapStateToProps(dispatch, options)
   const mapDispatchToProps = initMapDispatchToProps(dispatch, options)
   const mergeProps = initMergeProps(dispatch, options)
-
-  if (process.env.NODE_ENV !== 'production') {
-    verifySubselectors(mapStateToProps, mapDispatchToProps, mergeProps, options.displayName)
-  }
 
   const selectorFactory = options.pure
     ? pureFinalPropsSelectorFactory

@@ -1,5 +1,3 @@
-import verifyPlainObject from '../utils/verifyPlainObject'
-
 export function wrapMapToPropsConstant(getConstant) {
   return function initConstantSelector(dispatch, options) {
     const constant = getConstant(dispatch, options)
@@ -56,9 +54,6 @@ export function wrapMapToPropsFunc(mapToProps, methodName) {
         proxy.dependsOnOwnProps = getDependsOnOwnProps(props)
         props = proxy(stateOrDispatch, ownProps)
       }
-
-      if (process.env.NODE_ENV !== 'production') 
-        verifyPlainObject(props, displayName, methodName)
 
       return props
     }
