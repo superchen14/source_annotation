@@ -5,7 +5,6 @@ import { Component, createElement } from 'react'
 import Subscription from '../utils/Subscription'
 import { storeShape, subscriptionShape } from '../utils/PropTypes'
 
-let hotReloadingVersion = 0
 const dummyState = {}
 function noop() {}
 function makeSelectorStateful(sourceSelector, store) {
@@ -72,7 +71,6 @@ export default function connectAdvanced(
   } = {}
 ) {
   const subscriptionKey = storeKey + 'Subscription'
-  const version = hotReloadingVersion++
 
   const contextTypes = {
     [storeKey]: storeShape,
@@ -108,7 +106,6 @@ export default function connectAdvanced(
       constructor(props, context) {
         super(props, context)
 
-        this.version = version
         this.state = {}
         this.renderCount = 0
         this.store = props[storeKey] || context[storeKey]
@@ -247,40 +244,11 @@ export default function connectAdvanced(
       }
     }
 
-    /* eslint-enable react/no-deprecated */
-
     Connect.WrappedComponent = WrappedComponent
     Connect.displayName = displayName
     Connect.childContextTypes = childContextTypes
     Connect.contextTypes = contextTypes
     Connect.propTypes = contextTypes
-
-    if (process.env.NODE_ENV !== 'production') {
-      Connect.prototype.componentWillUpdate = function componentWillUpdate() {
-        // We are hot reloading!
-        if (this.version !== version) {
-          this.version = version
-          this.initSelector()
-
-          // If any connected descendants don't hot reload (and resubscribe in the process), their
-          // listeners will be lost when we unsubscribe. Unfortunately, by copying over all
-          // listeners, this does mean that the old versions of connected descendants will still be
-          // notified of state changes; however, their onStateChange function is a no-op so this
-          // isn't a huge deal.
-          let oldListeners = [];
-
-          if (this.subscription) {
-            oldListeners = this.subscription.listeners.get()
-            this.subscription.tryUnsubscribe()
-          }
-          this.initSubscription()
-          if (shouldHandleStateChanges) {
-            this.subscription.trySubscribe()
-            oldListeners.forEach(listener => this.subscription.listeners.subscribe(listener))
-          }
-        }
-      }
-    }
 
     return hoistStatics(Connect, WrappedComponent)
   }
