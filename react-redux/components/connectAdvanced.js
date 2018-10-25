@@ -54,10 +54,6 @@ export default function connectAdvanced(
     // probably overridden by wrapper functions such as connect()
     getDisplayName = name => `ConnectAdvanced(${name})`,
 
-    // shown in error messages
-    // probably overridden by wrapper functions such as connect()
-    methodName = 'connectAdvanced',
-
     // if defined, the name of the property passed to the wrapped element indicating the number of
     // calls to render. useful for watching in react devtools for unnecessary re-renders.
     renderCountProp = undefined,
@@ -87,12 +83,6 @@ export default function connectAdvanced(
   }
 
   return function wrapWithConnect(WrappedComponent) {
-    invariant(
-      typeof WrappedComponent == 'function',
-      `You must pass a component to the function returned by ` +
-      `${methodName}. Instead received ${JSON.stringify(WrappedComponent)}`
-    )
-
     const wrappedComponentName = WrappedComponent.displayName
       || WrappedComponent.name
       || 'Component'
@@ -102,7 +92,6 @@ export default function connectAdvanced(
     const selectorFactoryOptions = {
       ...connectOptions,
       getDisplayName,
-      methodName,
       renderCountProp,
       shouldHandleStateChanges,
       storeKey,
@@ -177,10 +166,7 @@ export default function connectAdvanced(
       }
 
       getWrappedInstance() {
-        invariant(withRef,
-          `To access the wrapped instance, you need to specify ` +
-          `{ withRef: true } in the options argument of the ${methodName}() call.`
-        )
+        invariant(withRef, "withRef设置为true才能获得wrappedInstance")
         return this.wrappedInstance
       }
 

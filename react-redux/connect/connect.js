@@ -62,9 +62,6 @@ export function createConnect({
     const initMergeProps = match(mergeProps, mergePropsFactories, 'mergeProps')
 
     return connectHOC(selectorFactory, {
-      // used in error messages
-      methodName: 'connect',
-
        // used to compute Connect's displayName from the wrapped component's displayName.
       getDisplayName: name => `Connect(${name})`,
 
