@@ -2,6 +2,7 @@ const hasOwn = Object.prototype.hasOwnProperty
 
 function is(x, y) {
   if (x === y) {
+    // 这段代码为了解决 0 === -0， +0 === -0 均为 true的问题，
     return x !== 0 || y !== 0 || 1 / x === 1 / y
   } else {
     return x !== x && y !== y
@@ -22,8 +23,7 @@ export default function shallowEqual(objA, objB) {
   if (keysA.length !== keysB.length) return false
 
   for (let i = 0; i < keysA.length; i++) {
-    if (!hasOwn.call(objB, keysA[i]) ||
-        !is(objA[keysA[i]], objB[keysA[i]])) {
+    if (!hasOwn.call(objB, keysA[i]) || !is(objA[keysA[i]], objB[keysA[i]])) {
       return false
     }
   }
