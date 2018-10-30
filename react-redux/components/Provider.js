@@ -1,6 +1,5 @@
 import { Component, Children } from 'react'
 import PropTypes from 'prop-types'
-import { storeShape, subscriptionShape } from '../utils/PropTypes'
 
 // Provider组件的逻辑很简单，就是将redux的store（主要是getState以及dispatch接口）注入到context
 export function createProvider(storeKey = 'store') {
@@ -21,16 +20,6 @@ export function createProvider(storeKey = 'store') {
           // 只允许有一个直接子组件
           return Children.only(this.props.children)
         }
-    }
-
-    Provider.propTypes = {
-        store: storeShape.isRequired,
-        children: PropTypes.element.isRequired,
-    }
-
-    Provider.childContextTypes = {
-        [storeKey]: storeShape.isRequired,
-        [subscriptionKey]: subscriptionShape,
     }
 
     return Provider

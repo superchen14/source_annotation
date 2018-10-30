@@ -3,7 +3,6 @@ import invariant from 'invariant'
 import { Component, createElement } from 'react'
 
 import Subscription from '../utils/Subscription'
-import { storeShape, subscriptionShape } from '../utils/PropTypes'
 
 const dummyState = {}
 function noop() {}
@@ -71,14 +70,6 @@ export default function connectAdvanced(
   } = {}
 ) {
   const subscriptionKey = storeKey + 'Subscription'
-
-  const contextTypes = {
-    [storeKey]: storeShape,
-    [subscriptionKey]: subscriptionShape,
-  }
-  const childContextTypes = {
-    [subscriptionKey]: subscriptionShape,
-  }
 
   return function wrapWithConnect(WrappedComponent) {
     const wrappedComponentName = WrappedComponent.displayName
@@ -246,9 +237,6 @@ export default function connectAdvanced(
 
     Connect.WrappedComponent = WrappedComponent
     Connect.displayName = displayName
-    Connect.childContextTypes = childContextTypes
-    Connect.contextTypes = contextTypes
-    Connect.propTypes = contextTypes
 
     return hoistStatics(Connect, WrappedComponent)
   }
