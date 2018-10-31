@@ -11,7 +11,9 @@ function makeSelectorStateful(sourceSelector, store) {
   const selector = {
     run: function runComponentSelector(props) {
       try {
+        // 根据store中的state以及父组件传过来的props计算nextProps
         const nextProps = sourceSelector(store.getState(), props)
+        // 如果nextProps与selector.props不同则标记为需要更新
         if (nextProps !== selector.props || selector.error) {
           selector.shouldComponentUpdate = true
           selector.props = nextProps
